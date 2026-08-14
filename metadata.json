@@ -1,0 +1,6 @@
+{
+  "name": "Mobile Shop Management",
+  "description": "An application for mobile shop inventory tracking, sales reporting, and customer notifications with role-based access control and physical/simulated barcode scanner.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

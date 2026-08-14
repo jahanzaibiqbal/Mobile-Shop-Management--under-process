@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@305..700&family=JetBrains+Mono:wght@100..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+::selection {
+  background-color: #cbd5e1;
+  color: #000000 !important;
+}
+
+::-moz-selection {
+  background-color: #cbd5e1;
+  color: #000000 !important;
+}
+

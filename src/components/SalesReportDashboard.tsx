@@ -411,7 +411,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
 
     if (activeTab === 'daily') {
       filename = `daily-sales-report-${selectedDay}.csv`;
-      rows.push(['Date', 'Time', 'Product Name', 'Barcode', 'Buyer Type', 'Quantity', 'Unit Price ($)', 'Discount ($)', 'Final Price ($)', 'Cashier', 'Phone']);
+      rows.push(['Date', 'Time', 'Product Name', 'Barcode', 'Buyer Type', 'Quantity', 'Unit Price (PKR)', 'Discount (PKR)', 'Final Price (PKR)', 'Cashier', 'Phone']);
       dailyData.dayLogs.forEach((l) => {
         rows.push([
           l.yyyymmdd,
@@ -429,7 +429,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
       });
     } else if (activeTab === 'monthly') {
       filename = `monthly-sales-report-${MONTH_NAMES[selectedMonth]}-${selectedMonthYear}.csv`;
-      rows.push(['Date', 'Units Sold', 'Retail Revenue ($)', 'Wholesale Revenue ($)', 'Total Revenue ($)', 'Transactions Count']);
+      rows.push(['Date', 'Units Sold', 'Retail Revenue (PKR)', 'Wholesale Revenue (PKR)', 'Total Revenue (PKR)', 'Transactions Count']);
       monthlyData.dailyBreakdown.forEach((d) => {
         rows.push([
           d.dateStr,
@@ -442,7 +442,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
       });
     } else if (activeTab === 'yearly') {
       filename = `yearly-sales-report-${selectedYear}.csv`;
-      rows.push(['Month', 'Transactions', 'Units Sold', 'Retail Revenue ($)', 'Wholesale Revenue ($)', 'Total Revenue ($)']);
+      rows.push(['Month', 'Transactions', 'Units Sold', 'Retail Revenue (PKR)', 'Wholesale Revenue (PKR)', 'Total Revenue (PKR)']);
       yearlyData.monthsBreakdown.forEach((m) => {
         rows.push([
           m.name,
@@ -455,7 +455,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
       });
     } else {
       filename = `full-sales-ledger-${Date.now()}.csv`;
-      rows.push(['Sale ID', 'Date & Time', 'Product Name', 'Barcode', 'Buyer Type', 'Units Sold', 'Unit Price ($)', 'Discount ($)', 'Final Revenue ($)', 'Processed By', 'Phone']);
+      rows.push(['Sale ID', 'Date & Time', 'Product Name', 'Barcode', 'Buyer Type', 'Units Sold', 'Unit Price (PKR)', 'Discount (PKR)', 'Final Revenue (PKR)', 'Processed By', 'Phone']);
       filteredLedgerLogs.forEach((l) => {
         rows.push([
           l.id,
@@ -684,7 +684,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                 Daily Revenue
               </span>
               <h4 className="text-xl font-black font-mono mt-1 text-white">
-                ${dailyData.totalRevenue.toLocaleString()}
+                PKR {dailyData.totalRevenue.toLocaleString()}
               </h4>
               <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
                 {dailyData.totalTransactions} transactions
@@ -710,7 +710,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                 Avg. Ticket / AOV
               </span>
               <h4 className="text-xl font-black font-mono mt-1 text-indigo-700">
-                ${dailyData.aov}
+                PKR {dailyData.aov.toLocaleString()}
               </h4>
               <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
                 Per sales receipt
@@ -723,7 +723,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                 Promos & Discounts
               </span>
               <h4 className="text-xl font-black font-mono mt-1 text-amber-700">
-                ${dailyData.totalDiscount}
+                PKR {dailyData.totalDiscount.toLocaleString()}
               </h4>
               <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
                 Given on retail orders
@@ -737,7 +737,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                   Est. Gross Profit
                 </span>
                 <h4 className="text-xl font-black font-mono mt-1 text-emerald-300">
-                  ${dailyData.totalProfit.toLocaleString()}
+                  PKR {dailyData.totalProfit.toLocaleString()}
                 </h4>
                 <p className="text-[9px] text-emerald-400/80 mt-0.5 font-mono">
                   {dailyData.totalRevenue > 0
@@ -750,8 +750,8 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                 <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 font-display block">
                   Buyer Balance
                 </span>
-                <h4 className="text-sm font-black font-mono mt-1 text-slate-800">
-                  ${dailyData.retailRevenue} / ${dailyData.wholesaleRevenue}
+                <h4 className="text-xs font-black font-mono mt-1 text-slate-800">
+                  PKR {dailyData.retailRevenue.toLocaleString()} / PKR {dailyData.wholesaleRevenue.toLocaleString()}
                 </h4>
                 <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
                   Retail vs Wholesale
@@ -774,7 +774,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                     Retail Walk-in Customers
                   </span>
                   <p className="text-lg font-black font-mono text-slate-900 mt-0.5">
-                    ${dailyData.retailRevenue.toLocaleString()}
+                    PKR {dailyData.retailRevenue.toLocaleString()}
                   </p>
                   <span className="text-[10px] text-slate-500 font-mono">
                     {dailyData.retailCount} orders
@@ -786,7 +786,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                     Wholesale Shopkeepers
                   </span>
                   <p className="text-lg font-black font-mono text-slate-900 mt-0.5">
-                    ${dailyData.wholesaleRevenue.toLocaleString()}
+                    PKR {dailyData.wholesaleRevenue.toLocaleString()}
                   </p>
                   <span className="text-[10px] text-slate-500 font-mono">
                     {dailyData.wholesaleCount} orders
@@ -813,7 +813,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                         <span className="text-[10px] text-slate-400 font-mono">({stat.count} sales, {stat.units} units)</span>
                       </div>
                       <span className="text-xs font-black font-mono text-slate-900">
-                        ${stat.revenue.toLocaleString()}
+                        PKR {stat.revenue.toLocaleString()}
                       </span>
                     </div>
                   ))
@@ -830,7 +830,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                 Sales Chronology For {selectedDay} ({dailyData.dayLogs.length} receipts)
               </span>
               <span className="text-[10px] font-mono text-indigo-300">
-                Gross: ${dailyData.totalRevenue.toLocaleString()}
+                Gross: PKR {dailyData.totalRevenue.toLocaleString()}
               </span>
             </div>
 
@@ -844,7 +844,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                     <th className="p-3 border-r border-slate-200 text-center">Qty</th>
                     <th className="p-3 border-r border-slate-200">Unit Price</th>
                     <th className="p-3 border-r border-slate-200">Discount</th>
-                    <th className="p-3 border-r border-slate-200">Total ($)</th>
+                    <th className="p-3 border-r border-slate-200">Total (PKR)</th>
                     <th className="p-3 border-r border-slate-200">Cashier</th>
                     <th className="p-3 text-center">Action</th>
                   </tr>
@@ -879,13 +879,13 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                           {log.quantity}x
                         </td>
                         <td className="p-3 border-r border-slate-150 font-mono text-slate-600">
-                          ${log.unitPrice}
+                          PKR {log.unitPrice.toLocaleString()}
                         </td>
                         <td className="p-3 border-r border-slate-150 font-mono text-slate-500">
-                          {log.discountApplied > 0 ? `-$${log.discountApplied}` : '$0'}
+                          {log.discountApplied > 0 ? `-PKR ${log.discountApplied.toLocaleString()}` : 'PKR 0'}
                         </td>
                         <td className="p-3 border-r border-slate-150 font-mono font-black text-slate-900">
-                          ${log.finalPrice.toLocaleString()}
+                          PKR {log.finalPrice.toLocaleString()}
                         </td>
                         <td className="p-3 border-r border-slate-150 font-display text-[11px] font-bold text-slate-700">
                           {log.soldBy}
@@ -893,7 +893,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                         <td className="p-3 text-center">
                           <button
                             onClick={() => {
-                              if (confirm(`Reverse transaction for ${log.productName} ($${log.finalPrice})? Stock will be restored.`)) {
+                              if (confirm(`Reverse transaction for ${log.productName} (PKR ${log.finalPrice.toLocaleString()})? Stock will be restored.`)) {
                                 onCancelSale(log.id);
                               }
                             }}
@@ -988,7 +988,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                 Total Monthly Revenue
               </span>
               <h4 className="text-xl font-black font-mono mt-1 text-white">
-                ${monthlyData.totalRevenue.toLocaleString()}
+                PKR {monthlyData.totalRevenue.toLocaleString()}
               </h4>
               <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
                 {monthlyData.totalTransactions} transactions
@@ -1012,7 +1012,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                 Daily Average Sales
               </span>
               <h4 className="text-xl font-black font-mono mt-1 text-indigo-700">
-                ${monthlyData.dailyAverage.toLocaleString()}
+                PKR {monthlyData.dailyAverage.toLocaleString()}
               </h4>
               <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
                 Active trading days
@@ -1030,8 +1030,8 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
               </h4>
               <p className="text-[9px] text-slate-500 mt-0.5 font-mono">
                 {monthlyData.peakDay && monthlyData.peakDay.revenue > 0
-                  ? `$${monthlyData.peakDay.revenue.toLocaleString()}`
-                  : '$0 revenue'}
+                  ? `PKR ${monthlyData.peakDay.revenue.toLocaleString()}`
+                  : 'PKR 0 revenue'}
               </p>
             </div>
 
@@ -1041,7 +1041,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                   Monthly Est. Profit
                 </span>
                 <h4 className="text-xl font-black font-mono mt-1 text-emerald-300">
-                  ${monthlyData.totalProfit.toLocaleString()}
+                  PKR {monthlyData.totalProfit.toLocaleString()}
                 </h4>
                 <p className="text-[9px] text-emerald-400/80 mt-0.5 font-mono">
                   {monthlyData.totalRevenue > 0
@@ -1055,7 +1055,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                   Wholesale Share
                 </span>
                 <h4 className="text-xl font-black font-mono mt-1 text-amber-700">
-                  ${monthlyData.wholesaleRevenue.toLocaleString()}
+                  PKR {monthlyData.wholesaleRevenue.toLocaleString()}
                 </h4>
                 <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
                   {monthlyData.wholesaleCount} shopkeeper sales
@@ -1077,7 +1077,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                 </p>
               </div>
               <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-sm">
-                Peak: ${maxMonthlyDayRev.toLocaleString()}
+                Peak: PKR {maxMonthlyDayRev.toLocaleString()}
               </span>
             </div>
 
@@ -1097,7 +1097,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                         <span className="font-bold block text-indigo-300 font-display">
                           {MONTH_NAMES[selectedMonth]} {d.day}, {selectedMonthYear}
                         </span>
-                        <span className="font-mono block">${d.revenue.toLocaleString()} ({d.units} items)</span>
+                        <span className="font-mono block">PKR {d.revenue.toLocaleString()} ({d.units} items)</span>
                       </div>
 
                       {/* Bar */}
@@ -1135,7 +1135,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                 Active Days Ledger • {MONTH_NAMES[selectedMonth]} {selectedMonthYear}
               </span>
               <span className="text-[10px] font-mono text-indigo-300">
-                Total: ${monthlyData.totalRevenue.toLocaleString()}
+                Total: PKR {monthlyData.totalRevenue.toLocaleString()}
               </span>
             </div>
 
@@ -1146,7 +1146,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                     <th className="p-3 border-r border-slate-200">Date</th>
                     <th className="p-3 border-r border-slate-200 text-center">Receipts</th>
                     <th className="p-3 border-r border-slate-200 text-center">Units Sold</th>
-                    <th className="p-3 border-r border-slate-200">Gross Sales ($)</th>
+                    <th className="p-3 border-r border-slate-200">Gross Sales (PKR)</th>
                     <th className="p-3 border-r border-slate-200">Contribution</th>
                     <th className="p-3 text-center">Inspect</th>
                   </tr>
@@ -1175,7 +1175,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                               {d.units}x
                             </td>
                             <td className="p-3 border-r border-slate-150 font-mono font-black text-slate-900">
-                              ${d.revenue.toLocaleString()}
+                              PKR {d.revenue.toLocaleString()}
                             </td>
                             <td className="p-3 border-r border-slate-150">
                               <div className="flex items-center gap-2">
@@ -1252,7 +1252,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                 Annual Gross Revenue
               </span>
               <h4 className="text-xl font-black font-mono mt-1 text-white">
-                ${yearlyData.totalRevenue.toLocaleString()}
+                PKR {yearlyData.totalRevenue.toLocaleString()}
               </h4>
               <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
                 {yearlyData.totalTransactions} transactions
@@ -1276,7 +1276,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                 Monthly Average
               </span>
               <h4 className="text-xl font-black font-mono mt-1 text-indigo-700">
-                ${yearlyData.monthlyAverage.toLocaleString()}
+                PKR {yearlyData.monthlyAverage.toLocaleString()}
               </h4>
               <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
                 Per calendar month
@@ -1294,8 +1294,8 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
               </h4>
               <p className="text-[9px] text-slate-500 mt-0.5 font-mono">
                 {yearlyData.bestMonth && yearlyData.bestMonth.revenue > 0
-                  ? `$${yearlyData.bestMonth.revenue.toLocaleString()}`
-                  : '$0'}
+                  ? `PKR ${yearlyData.bestMonth.revenue.toLocaleString()}`
+                  : 'PKR 0'}
               </p>
             </div>
 
@@ -1305,7 +1305,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                   Annual Est. Profit
                 </span>
                 <h4 className="text-xl font-black font-mono mt-1 text-emerald-300">
-                  ${yearlyData.totalProfit.toLocaleString()}
+                  PKR {yearlyData.totalProfit.toLocaleString()}
                 </h4>
                 <p className="text-[9px] text-emerald-400/80 mt-0.5 font-mono">
                   {yearlyData.totalRevenue > 0
@@ -1319,7 +1319,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                   Wholesale Share
                 </span>
                 <h4 className="text-xl font-black font-mono mt-1 text-amber-700">
-                  ${yearlyData.wholesaleRevenue.toLocaleString()}
+                  PKR {yearlyData.wholesaleRevenue.toLocaleString()}
                 </h4>
                 <p className="text-[9px] text-slate-400 mt-0.5 font-mono">
                   {yearlyData.wholesaleCount} bulk orders
@@ -1341,7 +1341,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                 </p>
               </div>
               <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-sm">
-                Peak: ${maxYearlyMonthRev.toLocaleString()}
+                Peak: PKR {maxYearlyMonthRev.toLocaleString()}
               </span>
             </div>
 
@@ -1366,7 +1366,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                         <span className="font-bold block text-indigo-300 font-display">
                           {m.name} {selectedYear}
                         </span>
-                        <span className="font-mono block">${m.revenue.toLocaleString()} ({m.units} units)</span>
+                        <span className="font-mono block">PKR {m.revenue.toLocaleString()} ({m.units} units)</span>
                       </div>
 
                       {/* Bar */}
@@ -1400,7 +1400,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                 Annual Financial Breakdown • {selectedYear}
               </span>
               <span className="text-[10px] font-mono text-indigo-300">
-                Annual Gross: ${yearlyData.totalRevenue.toLocaleString()}
+                Annual Gross: PKR {yearlyData.totalRevenue.toLocaleString()}
               </span>
             </div>
 
@@ -1413,7 +1413,7 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                     <th className="p-3 border-r border-slate-200 text-center">Hardware Units</th>
                     <th className="p-3 border-r border-slate-200">Retail Sales</th>
                     <th className="p-3 border-r border-slate-200">Wholesale Sales</th>
-                    <th className="p-3 border-r border-slate-200">Total Revenue ($)</th>
+                    <th className="p-3 border-r border-slate-200">Total Revenue (PKR)</th>
                     {isAdmin && <th className="p-3 border-r border-slate-200">Est. Profit</th>}
                     <th className="p-3 text-center">Action</th>
                   </tr>
@@ -1431,17 +1431,17 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                         {m.units}x
                       </td>
                       <td className="p-3 border-r border-slate-150 font-mono text-indigo-700">
-                        ${m.retailRev.toLocaleString()}
+                        PKR {m.retailRev.toLocaleString()}
                       </td>
                       <td className="p-3 border-r border-slate-150 font-mono text-amber-700">
-                        ${m.wholesaleRev.toLocaleString()}
+                        PKR {m.wholesaleRev.toLocaleString()}
                       </td>
                       <td className="p-3 border-r border-slate-150 font-mono font-black text-slate-900">
-                        ${m.revenue.toLocaleString()}
+                        PKR {m.revenue.toLocaleString()}
                       </td>
                       {isAdmin && (
                         <td className="p-3 border-r border-slate-150 font-mono text-emerald-700 font-bold">
-                          ${m.profit.toLocaleString()}
+                          PKR {m.profit.toLocaleString()}
                         </td>
                       )}
                       <td className="p-3 text-center">
@@ -1522,8 +1522,8 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                   <th className="p-3 border-r border-slate-800">Item Title</th>
                   <th className="p-3 border-r border-slate-800">Client Info</th>
                   <th className="p-3 border-r border-slate-800 text-center">Units</th>
-                  <th className="p-3 border-r border-slate-800">Disc. ($)</th>
-                  <th className="p-3 border-r border-slate-800">Total Collected</th>
+                  <th className="p-3 border-r border-slate-800">Disc. (PKR)</th>
+                  <th className="p-3 border-r border-slate-800">Total Collected (PKR)</th>
                   <th className="p-3 border-r border-slate-800">Processed by</th>
                   <th className="p-3 border-r border-slate-800">Date & Time</th>
                   <th className="p-3 text-center">Checkout Actions</th>
@@ -1573,13 +1573,13 @@ export const SalesReportDashboard: React.FC<SalesReportDashboardProps> = ({
                       {/* DISCOUNT */}
                       <td className="p-3 border-r border-slate-150 font-mono text-slate-600 text-[11px]">
                         {log.buyerType === 'customer' 
-                          ? (log.discountApplied > 0 ? `-$${log.discountApplied}` : '$0')
+                          ? (log.discountApplied > 0 ? `-PKR ${log.discountApplied.toLocaleString()}` : 'PKR 0')
                           : 'N/A'}
                       </td>
 
                       {/* FINAL AMOUNT */}
                       <td className="p-3 border-r border-slate-150 font-mono font-black text-slate-900 text-[13px]">
-                        ${log.finalPrice.toLocaleString()}
+                        PKR {log.finalPrice.toLocaleString()}
                       </td>
 
                       {/* PROCESSED BY */}

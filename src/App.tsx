@@ -93,7 +93,12 @@ export default function App() {
   };
 
   const handleScanSuccess = (barcode: string) => {
-    const found = products.find(p => p.barcode === barcode);
+    const clean = barcode.trim().toLowerCase();
+    const found = products.find(
+      p => p.barcode.toLowerCase() === clean || 
+           (p.barcodes || []).some(c => c.toLowerCase() === clean) ||
+           p.id.toLowerCase() === clean
+    );
     if (found) {
       setScannedProduct(found);
     } else {
@@ -148,7 +153,7 @@ export default function App() {
       id: `notif-sys-${Date.now()}`,
       type: 'System',
       recipient: 'Terminal System',
-      message: `Sale recorded: ${purchaseQuantity}x ${scannedProduct.name} ($${finalPrice}) by [${currentRole}]. Stock level updated.`,
+      message: `Sale recorded: ${purchaseQuantity}x ${scannedProduct.name} (PKR ${finalPrice.toLocaleString()}) by [${currentRole}]. Stock level updated.`,
       date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       status: 'sent',
     };
@@ -334,20 +339,11 @@ export default function App() {
           />
         </section>
 
-        {/* SECTION 3: Main dashboard modules */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Inventory Manager directory - takes 2 cols on wide display */}
-          <div className="lg:col-span-2">
-            <section id="google-sheets-sync">
-              <GoogleSheetsSync
-                products={products}
-                onImportProducts={(imported) => {
-                  setProducts(imported);
-                  triggerToast(`Updated catalogue with ${imported.length} items from Google Sheet.`, 'success');
-                }}
-                triggerToast={triggerToast}
-              />
-            </section>
+        {/* SECTION 3: Main dashboard modules (Custom order for Zohaib vs Admin/Shoaib) */}
+        {currentRole === 'Zohaib' ? (
+          /* ZOHAIB OPERATOR LAYOUT */
+          <div className="space-y-8">
+            {/* Products List directly below scanner with clickable pictures */}
             <section id="inventory-manager">
               <InventoryManager
                 products={products}
@@ -360,21 +356,67 @@ export default function App() {
                 onClearAddModalPrefill={() => setAddModalPrefill(null)}
               />
             </section>
-          </div>
 
-          {/* Sidebar reporting modules - takes 1 col */}
-          <div>
+            {/* Notification Center */}
             <section id="notifications">
               <NotificationCenter logs={notifications} onClear={() => setNotifications([])} />
             </section>
-          </div>
-        </div>
 
-        {/* SECTION 4: Sales Logs & Financial reports (Hidden from Zohaib) */}
-        {currentRole !== 'Zohaib' && (
-          <section id="sales-history" className="pt-2">
-            <SalesHistory logs={sales} currentUser={currentRole} onCancelSale={handleCancelSale} />
-          </section>
+            {/* Google Sheets Live Inventory Sync moved to LAST */}
+            <section id="google-sheets-sync">
+              <GoogleSheetsSync
+                products={products}
+                onImportProducts={(imported) => {
+                  setProducts(imported);
+                  triggerToast(`Updated catalogue with ${imported.length} items from Google Sheet.`, 'success');
+                }}
+                triggerToast={triggerToast}
+              />
+            </section>
+          </div>
+        ) : (
+          /* ADMIN & SHOAIB MANAGER LAYOUT */
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Inventory Manager directory - takes 2 cols on wide display */}
+              <div className="lg:col-span-2 space-y-6">
+                <section id="google-sheets-sync">
+                  <GoogleSheetsSync
+                    products={products}
+                    onImportProducts={(imported) => {
+                      setProducts(imported);
+                      triggerToast(`Updated catalogue with ${imported.length} items from Google Sheet.`, 'success');
+                    }}
+                    triggerToast={triggerToast}
+                  />
+                </section>
+                <section id="inventory-manager">
+                  <InventoryManager
+                    products={products}
+                    currentUser={currentRole}
+                    onAddProduct={handleAddProduct}
+                    onUpdateProduct={handleUpdateProduct}
+                    onDeleteProduct={handleDeleteProduct}
+                    onScanItem={handleScanItemDirectly}
+                    addModalPrefill={addModalPrefill}
+                    onClearAddModalPrefill={() => setAddModalPrefill(null)}
+                  />
+                </section>
+              </div>
+
+              {/* Sidebar reporting modules - takes 1 col */}
+              <div>
+                <section id="notifications">
+                  <NotificationCenter logs={notifications} onClear={() => setNotifications([])} />
+                </section>
+              </div>
+            </div>
+
+            {/* Sales Logs & Financial reports */}
+            <section id="sales-history" className="pt-2">
+              <SalesHistory logs={sales} currentUser={currentRole} onCancelSale={handleCancelSale} />
+            </section>
+          </div>
         )}
 
       </main>

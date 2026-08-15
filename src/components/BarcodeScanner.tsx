@@ -62,11 +62,12 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
     const query = manualInput.trim().toLowerCase();
     if (!query) return [];
     return products.filter((p) => {
-      const matchBarcode = p.barcode.toLowerCase().includes(query);
+      const matchPrimary = p.barcode.toLowerCase().includes(query);
+      const matchAllCodes = (p.barcodes || []).some(c => c.toLowerCase().includes(query));
       const matchName = p.name.toLowerCase().includes(query);
       const matchBrand = (p.brand || '').toLowerCase().includes(query);
       const matchModel = (p.modelName || '').toLowerCase().includes(query);
-      return matchBarcode || matchName || matchBrand || matchModel;
+      return matchPrimary || matchAllCodes || matchName || matchBrand || matchModel;
     }).slice(0, 6);
   }, [manualInput, products]);
 
@@ -132,11 +133,14 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
     if (!cleanCode) return;
 
     setLastScannedCode(cleanCode);
+    setManualInput(cleanCode); // Put scanned serial number in the input field for easy scanning/editing
     triggerBeep();
     onScanSuccess(cleanCode);
 
     const found = products.find(
-      (p) => p.barcode.toLowerCase() === cleanCode.toLowerCase() || p.id === cleanCode
+      (p) => p.barcode.toLowerCase() === cleanCode.toLowerCase() || 
+             (p.barcodes || []).some(c => c.toLowerCase() === cleanCode.toLowerCase()) || 
+             p.id === cleanCode
     );
 
     if (found) {
@@ -308,12 +312,14 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
 
     setLastScannedCode(clean);
     const found = products.find(
-      (p) => p.barcode.toLowerCase() === clean.toLowerCase() || p.id === clean
+      (p) => p.barcode.toLowerCase() === clean.toLowerCase() || 
+             (p.barcodes || []).some(c => c.toLowerCase() === clean.toLowerCase()) || 
+             p.id === clean
     );
 
     if (found) {
       onScanSuccess(found.barcode);
-      setManualInput('');
+      setManualInput(clean); // Keep the serial in the field for easy scanning and reference
       triggerBeep();
       showTemporaryMessage(`Found: ${found.name} (${found.brand})`, 'success');
     } else {
@@ -600,7 +606,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
                               setManualInput('');
                               setIsInputFocused(false);
                               triggerBeep();
-                              showTemporaryMessage(`Selected: ${p.name} (${p.brand})`, 'success');
+                              showTemporaryMessage(`Selected: ${p.name}`, 'success');
                             }}
                             className="p-2.5 hover:bg-indigo-50/70 transition-colors cursor-pointer flex items-center justify-between gap-2 text-left"
                           >
@@ -609,11 +615,6 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
                                 <span className="font-bold text-xs text-slate-900 truncate font-sans">
                                   {p.name}
                                 </span>
-                                {p.brand && (
-                                  <span className="text-[9px] font-bold bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded-xs uppercase font-display">
-                                    {p.brand}
-                                  </span>
-                                )}
                               </div>
                               <div className="flex items-center gap-2 mt-0.5 text-[10px] text-slate-500 font-mono">
                                 <span className="flex items-center gap-0.5 text-indigo-600 font-bold">
@@ -621,7 +622,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({
                                 </span>
                                 <span>•</span>
                                 <span className="text-slate-600 font-sans font-bold">
-                                  ${p.customerPrice.toLocaleString()}
+                                  PKR {p.customerPrice.toLocaleString()}
                                 </span>
                               </div>
                             </div>

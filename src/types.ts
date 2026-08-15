@@ -2,16 +2,17 @@ export type UserRole = 'Admin' | 'Zohaib' | 'Shoaib';
 
 export interface Product {
   id: string;
-  barcode: string;
+  barcode: string;           // Primary Barcode / Barcode 1
+  barcodes?: string[];       // Barcodes 1 to 10 for the same item
   name: string;
   brand: string;
   modelName: string;
-  costPrice: number;       // The original purchase cost by the shop
-  customerPrice: number;   // Retail price for normal customers
-  wholesalePrice: number;  // Wholesale price for other shopkeepers
+  costPrice: number;       // The original purchase cost by the shop in PKR
+  customerPrice: number;   // Retail price for normal customers in PKR
+  wholesalePrice: number;  // Wholesale price for other shopkeepers in PKR
   quantity: number;        // Stock count
   minQuantity: number;     // Trigger warning for low stock
-  discounts: number[];     // [Discount 1, Final Discount] simple discount amounts in PKR (e.g. [50, 100] means PKR 50 and PKR 100 off)
+  discounts: number[];     // [Discount 1, Final Discount] simple discount amounts in PKR
   imageUrl?: string;       // Picture of the product (base64 data URL or external URL)
 }
 

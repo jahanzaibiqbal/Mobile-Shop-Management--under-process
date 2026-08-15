@@ -62,7 +62,8 @@ export const DEFAULT_SPREADSHEET_ID = '1BYmtX-0CgXO6xaEa_O1GSAO1ol7qDfnEMJ_arbnM
 
 export const SHEET_HEADERS = [
   'ID',
-  'Barcode',
+  'Primary Barcode',
+  'All Barcodes (1 to 10)',
   'Name',
   'Brand',
   'Model Name',
@@ -73,7 +74,7 @@ export const SHEET_HEADERS = [
   'Min Quantity',
   'Discount 1 (PKR)',
   'Final Discount (PKR)',
-  'Picture URL'
+  'Picture (URL / Base64)'
 ];
 
 /**
@@ -113,18 +114,19 @@ export async function fetchSheetProducts(
   };
 
   const idIdx = getColIdx(['id'], 0);
-  const barcodeIdx = getColIdx(['barcode', 'code', 'qr'], 1);
-  const nameIdx = getColIdx(['name', 'item', 'title', 'product'], 2);
-  const brandIdx = getColIdx(['brand', 'manufacturer'], 3);
-  const modelIdx = getColIdx(['model'], 4);
-  const costIdx = getColIdx(['cost'], 5);
-  const custIdx = getColIdx(['customer', 'retail', 'price'], 6);
-  const wsIdx = getColIdx(['wholesale', 'shopkeeper'], 7);
-  const qtyIdx = getColIdx(['quantity', 'qty', 'stock'], 8);
-  const minQtyIdx = getColIdx(['min', 'low'], 9);
-  const disc1Idx = getColIdx(['discount 1', 'disc 1', 'discount', 'discounts'], 10);
-  const finalDiscIdx = getColIdx(['final discount', 'final disc'], 11);
-  const imgIdx = getColIdx(['picture', 'image', 'photo', 'img', 'url'], 12);
+  const barcodeIdx = getColIdx(['primary barcode', 'barcode', 'code', 'qr'], 1);
+  const multiBarcodesIdx = getColIdx(['all barcodes', 'barcodes (1 to 10)', 'barcodes', 'other barcodes'], 2);
+  const nameIdx = getColIdx(['name', 'item', 'title', 'product'], 3);
+  const brandIdx = getColIdx(['brand', 'manufacturer'], 4);
+  const modelIdx = getColIdx(['model'], 5);
+  const costIdx = getColIdx(['cost'], 6);
+  const custIdx = getColIdx(['customer', 'retail', 'price'], 7);
+  const wsIdx = getColIdx(['wholesale', 'shopkeeper'], 8);
+  const qtyIdx = getColIdx(['quantity', 'qty', 'stock'], 9);
+  const minQtyIdx = getColIdx(['min', 'low'], 10);
+  const disc1Idx = getColIdx(['discount 1', 'disc 1', 'discount', 'discounts'], 11);
+  const finalDiscIdx = getColIdx(['final discount', 'final disc'], 12);
+  const imgIdx = getColIdx(['picture', 'image', 'photo', 'img', 'url'], 13);
 
   const products: Product[] = [];
 
@@ -139,11 +141,30 @@ export async function fetchSheetProducts(
 
     const d1 = parseNum(row[disc1Idx], 5);
     const dFinal = row[finalDiscIdx] !== undefined ? parseNum(row[finalDiscIdx], 10) : 10;
-    const imageUrl = row[imgIdx] ? String(row[imgIdx]).trim() : undefined;
+    const rawImg = row[imgIdx] ? String(row[imgIdx]).trim() : undefined;
+    const primaryCode = String(row[barcodeIdx] || `100${i}`).trim();
+
+    // Parse multiple barcodes if present (comma, pipe, semicolon, or space separated)
+    let parsedBarcodes: string[] = [];
+    if (row[multiBarcodesIdx]) {
+      const rawCodes = String(row[multiBarcodesIdx]);
+      parsedBarcodes = rawCodes
+        .split(/[,;|]+/)
+        .map(c => c.trim())
+        .filter(c => c.length > 0);
+    }
+    if (parsedBarcodes.length === 0 && primaryCode) {
+      parsedBarcodes = [primaryCode];
+    } else if (primaryCode && !parsedBarcodes.includes(primaryCode)) {
+      parsedBarcodes.unshift(primaryCode);
+    }
+    // Limit to max 10 barcodes
+    parsedBarcodes = parsedBarcodes.slice(0, 10);
 
     products.push({
       id: String(row[idIdx] || `sheet-prod-${i}-${Date.now()}`),
-      barcode: String(row[barcodeIdx] || `100${i}`),
+      barcode: primaryCode,
+      barcodes: parsedBarcodes,
       name: String(row[nameIdx] || `Product ${i}`),
       brand: String(row[brandIdx] || 'Generic'),
       modelName: String(row[modelIdx] || 'Standard'),
@@ -153,7 +174,7 @@ export async function fetchSheetProducts(
       quantity: Math.max(0, Math.floor(parseNum(row[qtyIdx], 10))),
       minQuantity: Math.max(1, Math.floor(parseNum(row[minQtyIdx], 2))),
       discounts: [d1, dFinal],
-      imageUrl: imageUrl && imageUrl.startsWith('http') ? imageUrl : undefined
+      imageUrl: rawImg && (rawImg.startsWith('http') || rawImg.startsWith('data:image')) ? rawImg : undefined
     });
   }
 
@@ -175,24 +196,28 @@ export async function writeSheetProducts(
 
   const values = [
     SHEET_HEADERS,
-    ...products.map(p => [
-      p.id,
-      p.barcode,
-      p.name,
-      p.brand,
-      p.modelName,
-      p.costPrice,
-      p.customerPrice,
-      p.wholesalePrice,
-      p.quantity,
-      p.minQuantity,
-      p.discounts && p.discounts.length > 0 ? p.discounts[0] : 5,
-      p.discounts && p.discounts.length > 1 ? p.discounts[1] : 10,
-      p.imageUrl && p.imageUrl.startsWith('http') ? p.imageUrl : ''
-    ])
+    ...products.map(p => {
+      const allCodes = p.barcodes && p.barcodes.length > 0 ? p.barcodes.join(', ') : p.barcode;
+      return [
+        p.id,
+        p.barcode,
+        allCodes,
+        p.name,
+        p.brand,
+        p.modelName,
+        p.costPrice,
+        p.customerPrice,
+        p.wholesalePrice,
+        p.quantity,
+        p.minQuantity,
+        p.discounts && p.discounts.length > 0 ? p.discounts[0] : 5,
+        p.discounts && p.discounts.length > 1 ? p.discounts[1] : 10,
+        p.imageUrl || ''
+      ];
+    })
   ];
 
-  const range = `${sheetName}!A1:M${values.length + 5}`;
+  const range = `${sheetName}!A1:N${values.length + 5}`;
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`;
 
   const res = await fetch(url, {

@@ -2,6 +2,7 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User, signOut } from 'firebase/auth';
 import firebaseConfig from '../../firebase-applet-config.json';
 import { Product } from '../types';
+import { sanitizeImageForSheet } from './imageUtils';
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 export const auth = getAuth(app);
@@ -141,7 +142,16 @@ export async function fetchSheetProducts(
 
     const d1 = parseNum(row[disc1Idx], 5);
     const dFinal = row[finalDiscIdx] !== undefined ? parseNum(row[finalDiscIdx], 10) : 10;
-    const rawImg = row[imgIdx] ? String(row[imgIdx]).trim() : undefined;
+    
+    let rawImg = row[imgIdx] ? String(row[imgIdx]).trim() : undefined;
+    if (rawImg) {
+      // Check if it's an =IMAGE("...") formula from Google Sheets
+      const formulaMatch = rawImg.match(/=IMAGE\s*\(\s*["']([^"']+)["']/i);
+      if (formulaMatch) {
+        rawImg = formulaMatch[1].trim();
+      }
+    }
+
     const primaryCode = String(row[barcodeIdx] || `100${i}`).trim();
 
     // Parse multiple barcodes if present (comma, pipe, semicolon, or space separated)
@@ -212,7 +222,7 @@ export async function writeSheetProducts(
         p.minQuantity,
         p.discounts && p.discounts.length > 0 ? p.discounts[0] : 5,
         p.discounts && p.discounts.length > 1 ? p.discounts[1] : 10,
-        p.imageUrl || ''
+        sanitizeImageForSheet(p.imageUrl)
       ];
     })
   ];

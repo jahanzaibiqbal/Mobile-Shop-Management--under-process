@@ -18,6 +18,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { QrCodeScannerModal } from './QrCodeScannerModal';
+import { compressImageFile } from '../lib/imageUtils';
 
 interface InventoryManagerProps {
   products: Product[];
@@ -147,25 +148,26 @@ export const InventoryManager: React.FC<InventoryManagerProps> = ({
     return code;
   };
 
-  const handleImageFileChange = (
+  const handleImageFileChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
     setter: (val: string) => void
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 3 * 1024 * 1024) {
-      alert('Image size exceeds 3MB limit. Please choose a smaller photo.');
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image size exceeds 10MB limit. Please choose a smaller photo.');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setter(reader.result);
+    try {
+      const compressedDataUrl = await compressImageFile(file, 260, 260, 0.75);
+      if (compressedDataUrl) {
+        setter(compressedDataUrl);
       }
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('Failed to compress image:', err);
+    }
   };
 
   const openAddModal = () => {

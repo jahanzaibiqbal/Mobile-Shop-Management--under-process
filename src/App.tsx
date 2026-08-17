@@ -53,21 +53,37 @@ export default function App() {
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
   const [addModalPrefill, setAddModalPrefill] = useState<{ barcode?: string; name?: string; brand?: string; templateProduct?: Product } | null>(null);
 
-  // Synchronize storage
+  // Synchronize storage safely
   useEffect(() => {
-    localStorage.setItem('mobshop_products', JSON.stringify(products));
+    try {
+      localStorage.setItem('mobshop_products', JSON.stringify(products));
+    } catch (err) {
+      console.warn('Failed to persist products to localStorage:', err);
+    }
   }, [products]);
 
   useEffect(() => {
-    localStorage.setItem('mobshop_sales', JSON.stringify(sales));
+    try {
+      localStorage.setItem('mobshop_sales', JSON.stringify(sales));
+    } catch (err) {
+      console.warn('Failed to persist sales to localStorage:', err);
+    }
   }, [sales]);
 
   useEffect(() => {
-    localStorage.setItem('mobshop_notifications', JSON.stringify(notifications));
+    try {
+      localStorage.setItem('mobshop_notifications', JSON.stringify(notifications));
+    } catch (err) {
+      console.warn('Failed to persist notifications to localStorage:', err);
+    }
   }, [notifications]);
 
   useEffect(() => {
-    localStorage.setItem('mobshop_role', currentRole);
+    try {
+      localStorage.setItem('mobshop_role', currentRole);
+    } catch (err) {
+      console.warn('Failed to persist role to localStorage:', err);
+    }
   }, [currentRole]);
 
   // Show Toast Feedback Helper
